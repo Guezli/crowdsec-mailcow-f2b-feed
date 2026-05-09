@@ -1,0 +1,17 @@
+filter: "evt.Parsed.program == 'mailcow-f2b' && evt.Parsed.message contains 'Banning'"
+onsuccess: next_stage
+name: Guezli/mailcow-f2b-bans
+description: "Parse Mailcow netfilter-mailcow final-ban lines (CRIT: Banning IP/32 for N minutes)"
+nodes:
+  - grok:
+      pattern: 'Banning %{IP:banned_ip}/\d+ for %{NUMBER:ban_min} minutes'
+      apply_on: message
+    statics:
+      - meta: source_ip
+        expression: evt.Parsed.banned_ip
+      - meta: log_type
+        value: mailcow_f2b_ban
+      - meta: ban_duration_min
+        expression: evt.Parsed.ban_min
+      - meta: service
+        value: mailcow-f2b

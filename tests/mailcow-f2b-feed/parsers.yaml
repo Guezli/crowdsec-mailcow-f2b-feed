@@ -1,0 +1,5 @@
+parsers:
+  - crowdsecurity/syslog-logs
+  - crowdsecurity/dateparse-enrich
+  - crowdsecurity/geoip-enrich
+  - Guezli/mailcow-f2b-bans

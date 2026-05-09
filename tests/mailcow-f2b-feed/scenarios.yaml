@@ -1,0 +1,7 @@
+scenarios:
+  - Guezli/mailcow-f2b-feed
+
+# Expected: 1 ban-line from netfilter-mailcow → 1 overflow (trigger-type)
+#
+# Run with:
+#   cscli hubtest run mailcow-f2b-feed --clean
