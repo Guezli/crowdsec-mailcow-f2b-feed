@@ -1,10 +1,13 @@
-filter: "evt.Parsed.program == 'mailcow-f2b' && evt.Parsed.message contains 'Banning'"
+filter: "evt.Parsed.program == 'mailcow-f2b' && (evt.Parsed.message contains 'Banning' || evt.Parsed.message contains 'Added host/network')"
 onsuccess: next_stage
 name: Guezli/mailcow-f2b-bans
-description: "Parse Mailcow netfilter-mailcow final-ban lines (CRIT: Banning IP/32 for N minutes)"
+description: "Parse Mailcow netfilter-mailcow ban lines (auto-rule-trigger + manual perm-ban)"
 nodes:
   - grok:
-      pattern: 'Banning %{IP:banned_ip}/\d+ for %{NUMBER:ban_min} minutes'
+      # Two patterns netfilter-mailcow emits as CRIT-bans:
+      #   "Banning <IP>/<N> for <M> minutes"          → auto-trigger via F2B regex (CIDR-suffix present)
+      #   "Added host/network <IP> to denylist"       → manual perm-ban via F2B_BLACKLIST (no CIDR-suffix)
+      pattern: '(?:Banning|Added host/network) %{IP:banned_ip}(?:/\d+)?(?: for %{NUMBER:ban_min} minutes| to denylist)'
       apply_on: message
     statics:
       - meta: source_ip
